@@ -93,8 +93,8 @@ const App: React.FC = () => {
             <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-300">
               <button onClick={() => setCurrentView('landing')} className="hover:text-white transition">Agents</button>
               <button onClick={() => setCurrentView('landing')} className="hover:text-white transition">Benefits</button>
-              <button onClick={() => setCurrentView('landing')} className="hover:text-white transition">How it Works</button>
-              <button onClick={() => setCurrentView('landing')} className="text-red-400 hover:text-red-300 transition">Live Stats</button>
+              <button onClick={() => setCurrentView('landing')} className="hover:text-white transition">How it works</button>
+              <button onClick={() => setCurrentView('landing')} className="text-red-400 hover:text-red-300 transition">Version 0.4</button>
               
               {/* New Diagnostics Button */}
               <button 

@@ -240,7 +240,6 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
                             log.type === 'tool_req' ? 'bg-blue-900/20 border-blue-800 text-blue-300' :
                             log.type === 'tool_res' ? 'bg-green-900/20 border-green-800 text-green-300' :
                             log.type === 'webhook' ? 'bg-purple-900/20 border-purple-800 text-purple-300' :
-                            log.type === 'chat' ? 'bg-gray-800/50 border-gray-700 text-gray-300' :
                             log.type === 'error' ? 'bg-red-900/20 border-red-800 text-red-300' :
                             'bg-gray-900 border-gray-800 text-gray-400'
                         }`}>

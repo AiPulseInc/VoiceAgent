@@ -3,7 +3,7 @@ import { floatTo16BitPCM, base64ToArrayBuffer, RECORDER_WORKLET_CODE } from '../
 import { scheduleWithWebhook, logCallback } from '../utils/mockBackend';
 
 export interface LogEntry {
-  type: 'info' | 'tool_req' | 'tool_res' | 'error' | 'webhook' | 'chat';
+  type: 'info' | 'tool_req' | 'tool_res' | 'error' | 'webhook';
   message: string;
   data?: any;
 }
@@ -124,13 +124,13 @@ export class GeminiLiveService {
             const inputTranscript = message.serverContent?.inputTranscription?.text;
             if (inputTranscript) {
                 options.onTranscript('user', inputTranscript);
-                options.onLog({ type: 'chat', message: `User: ${inputTranscript}` });
+                // Removed chat logging to avoid duplication
             }
 
             const outputTranscript = message.serverContent?.outputTranscription?.text;
             if (outputTranscript) {
                 options.onTranscript('model', outputTranscript);
-                options.onLog({ type: 'chat', message: `Agent: ${outputTranscript}` });
+                // Removed chat logging to avoid duplication
             }
 
             // Function Calls
