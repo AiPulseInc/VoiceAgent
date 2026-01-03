@@ -1,0 +1,7 @@
+{
+  "name": "RapidTire Auto Service",
+  "description": "A demo of voice AI agents for a busy tire workshop handling bookings and overflow calls.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
