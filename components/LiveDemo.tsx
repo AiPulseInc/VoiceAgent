@@ -3,12 +3,34 @@ import { GeminiLiveService, LogEntry } from '../services/geminiService';
 import { AGENT_CONFIGS } from '../constants';
 import { AgentType, ChatMessage } from '../types';
 import Visualizer from './Visualizer';
-import { X, Mic, MicOff, Phone, Settings, Terminal, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Mic, MicOff, Phone, Settings, Terminal } from 'lucide-react';
 
 interface LiveDemoProps {
   agentType: AgentType;
   onClose: () => void;
 }
+
+const getTimeContext = () => {
+  const now = new Date();
+  const warsawFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Warsaw',
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false
+  });
+  const currentDateTime = warsawFormatter.format(now);
+  
+  return `
+  [SYSTEM CONTEXT]
+  - You are operating in the Europe/Warsaw Timezone.
+  - The current date and time is: ${currentDateTime}.
+  - Use this specific timestamp to resolve relative references like "tomorrow", "today", or "next Monday" into exact YYYY-MM-DD dates.
+  `;
+};
 
 const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
   const [isActive, setIsActive] = useState(false);
@@ -42,34 +64,11 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
       setDebugLogs([]);
       serviceRef.current = new GeminiLiveService();
 
-      // --- TIMEZONE INJECTION ---
-      const now = new Date();
-      const warsawFormatter = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'Europe/Warsaw',
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        hour12: false
-      });
-      const currentDateTime = warsawFormatter.format(now);
-      
-      const timeContext = `
-      
-      [SYSTEM CONTEXT]
-      - You are operating in the Europe/Warsaw Timezone.
-      - The current date and time is: ${currentDateTime}.
-      - Use this specific timestamp to resolve relative references like "tomorrow", "today", or "next Monday" into exact YYYY-MM-DD dates.
-      `;
-      // --------------------------
-
       await serviceRef.current.connect({
-        systemInstruction: config.systemInstruction + timeContext,
+        systemInstruction: config.systemInstruction + getTimeContext(),
         voiceName: config.voice,
         onAudioData: () => {
-            // Visualizer handled by CSS
+            // Visualizer handled by CSS via analysis or mock
         },
         onTranscript: (role, text) => {
           setMessages(prev => {

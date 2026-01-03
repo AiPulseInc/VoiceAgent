@@ -1,32 +1,3 @@
-import { ServiceDefinition, ServiceType, Bay } from './types';
-
-export const SERVICES: Record<ServiceType, ServiceDefinition> = {
-  [ServiceType.WHEEL_SWAP]: {
-    id: ServiceType.WHEEL_SWAP,
-    label: 'Wheel Swap (Complete Wheels)',
-    duration: 25,
-    requiredBayType: 'STANDARD',
-  },
-  [ServiceType.TIRE_CHANGE]: {
-    id: ServiceType.TIRE_CHANGE,
-    label: 'Tire Change (Tires on Rims)',
-    duration: 40,
-    requiredBayType: 'STANDARD',
-  },
-  [ServiceType.MOUNTING]: {
-    id: ServiceType.MOUNTING,
-    label: 'Tire Mounting/Balancing (Off Rims)',
-    duration: 75,
-    requiredBayType: 'ADVANCED',
-  },
-};
-
-export const BAYS: Bay[] = [
-  { id: 'A', name: 'Bay A', type: 'STANDARD' },
-  { id: 'B', name: 'Bay B', type: 'STANDARD' },
-  { id: 'C', name: 'Bay C', type: 'ADVANCED' },
-];
-
 export const AGENT_CONFIGS = {
   BOOKING: {
     name: "Front Desk Agent",

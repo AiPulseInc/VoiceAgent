@@ -75,14 +75,20 @@ export class GeminiLiveService {
 
     try {
       this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-      await this.audioContext.audioWorklet.addModule(
-        'data:text/javascript;base64,' + btoa(RECORDER_WORKLET_CODE)
-      );
+      
+      // Optimization: Load module only if context exists
+      if (this.audioContext) {
+        await this.audioContext.audioWorklet.addModule(
+            'data:text/javascript;base64,' + btoa(RECORDER_WORKLET_CODE)
+        );
+      }
 
       this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: {
         sampleRate: 16000,
         channelCount: 1,
-        echoCancellation: true
+        echoCancellation: true,
+        autoGainControl: true,
+        noiseSuppression: true
       }});
 
       const tools = [scheduleAppointmentTool, logCallbackTool];
@@ -101,7 +107,6 @@ export class GeminiLiveService {
         },
         callbacks: {
           onopen: () => {
-            console.log("Session opened");
             options.onLog({ type: 'info', message: 'Session Connected' });
             this.isConnected = true;
             this.startAudioInput();
@@ -130,8 +135,6 @@ export class GeminiLiveService {
 
             // Function Calls
             if (message.toolCall) {
-              console.log("🛠️ [Gemini] Model is requesting tool execution:", message.toolCall);
-              
               for (const fc of message.toolCall.functionCalls) {
                 options.onToolUse(fc.name, 'started');
                 options.onLog({ 
@@ -166,7 +169,6 @@ export class GeminiLiveService {
                   options.onLog({ type: 'tool_res', message: `Tool ${fc.name} Finished`, data: result });
 
                 } catch (e) {
-                  console.error("Tool execution error:", e);
                   const errMessage = (e as Error).message;
                   result = { error: errMessage };
                   options.onLog({ type: 'error', message: `Tool Execution Failed: ${errMessage}` });
@@ -186,12 +188,10 @@ export class GeminiLiveService {
             }
           },
           onclose: () => {
-            console.log("Session closed");
             options.onLog({ type: 'info', message: 'Session Closed' });
             this.disconnect();
           },
           onerror: (err) => {
-            console.error(err);
             options.onError(err.message || "Unknown error");
             options.onLog({ type: 'error', message: `Session Error: ${err.message}` });
             this.disconnect();
@@ -211,7 +211,6 @@ export class GeminiLiveService {
     this.workletNode = new AudioWorkletNode(this.audioContext, 'recorder-processor');
 
     this.workletNode.port.onmessage = (event) => {
-      // Float32 from AudioContext. Convert to PCM 16bit for Gemini.
       const pcmData = floatTo16BitPCM(event.data);
       const base64 = btoa(String.fromCharCode(...new Uint8Array(pcmData.buffer)));
       
@@ -226,21 +225,20 @@ export class GeminiLiveService {
     };
 
     source.connect(this.workletNode);
-    this.workletNode.connect(this.audioContext.destination); // Keep alive
+    this.workletNode.connect(this.audioContext.destination); 
   }
 
   private async decodeAudio(base64: string): Promise<AudioBuffer> {
     if (!this.audioContext) throw new Error("No context");
     const arrayBuffer = base64ToArrayBuffer(base64);
     
-    // Create buffer manually because decodeAudioData expects file headers usually, but Gemini sends raw PCM
     const pcm16 = new Int16Array(arrayBuffer);
     const float32 = new Float32Array(pcm16.length);
     for(let i=0; i<pcm16.length; i++) {
         float32[i] = pcm16[i] / 32768.0;
     }
 
-    const buffer = this.audioContext.createBuffer(1, float32.length, 24000); // Model returns 24kHz
+    const buffer = this.audioContext.createBuffer(1, float32.length, 24000); 
     buffer.getChannelData(0).set(float32);
     return buffer;
   }
@@ -248,9 +246,7 @@ export class GeminiLiveService {
   private playAudio(buffer: AudioBuffer) {
     if (!this.audioContext) return;
     
-    // Scheduling
     const now = this.audioContext.currentTime;
-    // If nextStartTime is in the past, reset to now
     const startTime = Math.max(now, this.nextStartTime);
     
     const source = this.audioContext.createBufferSource();
@@ -263,10 +259,24 @@ export class GeminiLiveService {
 
   disconnect() {
     this.isConnected = false;
-    this.mediaStream?.getTracks().forEach(t => t.stop());
-    this.workletNode?.disconnect();
-    this.audioContext?.close();
-    this.audioContext = null;
+    
+    if (this.mediaStream) {
+        this.mediaStream.getTracks().forEach(t => t.stop());
+        this.mediaStream = null;
+    }
+    
+    if (this.workletNode) {
+        this.workletNode.disconnect();
+        this.workletNode = null;
+    }
+    
+    if (this.audioContext) {
+        if (this.audioContext.state !== 'closed') {
+            this.audioContext.close();
+        }
+        this.audioContext = null;
+    }
+    
     this.sessionPromise = null;
     this.nextStartTime = 0;
   }
