@@ -15,7 +15,7 @@ export const autoServiceConfig: DemoConfig = {
   images: {
     hero: 'rapid-tire-hero.jpg' // Placeholder, handled in App state usually
   },
-  webhookUrl: 'https://n8n-aipulse.up.railway.app/webhook-test/rapidtire',
+  webhookUrl: 'https://n8n-aipulse.up.railway.app/webhook/rapidtire',
   agents: {
     [AgentType.BOOKING]: {
       name: "Front Desk Agent",

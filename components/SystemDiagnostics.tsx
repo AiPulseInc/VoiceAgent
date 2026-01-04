@@ -99,11 +99,22 @@ const SystemDiagnostics: React.FC<SystemDiagnosticsProps> = ({ onBack, webhookUr
             onTranscript: () => {},
             onToolUse: () => {},
             onLog: () => {}, // No-op for this test
-            onError: (err) => { throw new Error(err); }
+            onError: (err) => { 
+                // Do not throw here as it might be async
+                updateStep('socket', { status: 'error', message: err || 'Connection failed' });
+            }
         });
         await new Promise(r => setTimeout(r, 1500)); // Let it sit for a moment
         serviceRef.current.disconnect();
-        updateStep('socket', { status: 'success', message: 'Connection established' });
+        
+        // If we haven't already marked it as error
+        setSteps(currentSteps => {
+            const socketStep = currentSteps.find(s => s.id === 'socket');
+            if (socketStep && socketStep.status !== 'error') {
+                return currentSteps.map(s => s.id === 'socket' ? { ...s, status: 'success', message: 'Connection established' } : s);
+            }
+            return currentSteps;
+        });
     } catch (e: any) {
         updateStep('socket', { status: 'error', message: e.message || 'Connection failed' });
     } finally {

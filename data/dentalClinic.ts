@@ -15,7 +15,7 @@ export const dentalConfig: DemoConfig = {
   images: {
     hero: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=2068' // Dental placeholder
   },
-  webhookUrl: 'https://n8n-aipulse.up.railway.app/webhook-test/brightsmile',
+  webhookUrl: 'https://n8n-aipulse.up.railway.app/webhook/brightsmile',
   agents: {
     [AgentType.BOOKING]: {
       name: "Receptionist Sarah",
@@ -156,7 +156,7 @@ export const dentalConfig: DemoConfig = {
       callbacks: "Logi Triage",
       recentBookings: "Ostatnie Wizyty",
       recentCallbacks: "Nagłe Przypadki",
-      noData: "Brak danych pacjentów.",
+      noData: "Brak danych.",
       howItWorksTitle: "Ścieżka Pacjenta",
       step1Title: "Pacjent Dzwoni",
       step1Desc: "Połączenia są odbierane natychmiast przez recepcjonistkę AI.",
