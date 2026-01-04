@@ -117,7 +117,7 @@ const SystemDiagnostics: React.FC<SystemDiagnosticsProps> = ({ onBack }) => {
       
       const payload = { ...webhookForm };
       addToLog(`📦 Payload Prepared:\n${JSON.stringify(payload, null, 2)}`);
-      addToLog(`📡 Target: https://n8n-aipulse.up.railway.app/webhook-test/test`);
+      addToLog(`📡 Target: https://n8n-aipulse.up.railway.app/webhook/rapidtire`);
 
       try {
           const result = await scheduleWithWebhook(payload);

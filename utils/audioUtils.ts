@@ -1,21 +1,5 @@
 // Audio encoding/decoding utilities for Gemini Live API
 
-export const blobToBase64 = (blob: Blob): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        const base64 = reader.result.split(',')[1];
-        resolve(base64);
-      } else {
-        reject(new Error('Failed to convert blob to base64'));
-      }
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
-
 // Convert Float32Array (Web Audio API) to Int16Array (PCM 16kHz)
 export const floatTo16BitPCM = (input: Float32Array): Int16Array => {
   const output = new Int16Array(input.length);

@@ -29,7 +29,7 @@ export const scheduleWithWebhook = async (data: WebhookPayload) => {
     const timeoutId = setTimeout(() => controller.abort(), 15000); 
 
     try {
-        const response = await fetch('https://n8n-aipulse.up.railway.app/webhook-test/test', {
+        const response = await fetch('https://n8n-aipulse.up.railway.app/webhook/rapidtire', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

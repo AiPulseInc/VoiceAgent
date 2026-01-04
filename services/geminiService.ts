@@ -53,7 +53,7 @@ const logCallbackTool: FunctionDeclaration = {
 };
 
 export class GeminiLiveService {
-  private ai: GoogleGenAI;
+  private ai: GoogleGenAI | null = null;
   private audioContext: AudioContext | null = null;
   private mediaStream: MediaStream | null = null;
   private workletNode: AudioWorkletNode | null = null;
@@ -63,17 +63,19 @@ export class GeminiLiveService {
   private sessionPromise: Promise<any> | null = null;
 
   constructor() {
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) {
-        throw new Error("API Key not found. Please select a key or check configuration.");
-    }
-    this.ai = new GoogleGenAI({ apiKey });
+    // Lazy initialization handled in connect()
   }
 
   async connect(options: ConnectOptions) {
     if (this.isConnected) return;
 
     try {
+      const apiKey = process.env.API_KEY;
+      if (!apiKey) {
+          throw new Error("API Key not found. Please select a key or check configuration.");
+      }
+      this.ai = new GoogleGenAI({ apiKey });
+
       this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
       
       // Optimization: Load module only if context exists
@@ -147,7 +149,7 @@ export class GeminiLiveService {
                 try {
                   const args = fc.args as any;
                   if (fc.name === 'scheduleAppointment') {
-                    options.onLog({ type: 'webhook', message: 'Sending POST request...', data: { url: 'https://n8n-aipulse.up.railway.app/webhook-test/test', payload: args } });
+                    options.onLog({ type: 'webhook', message: 'Sending POST request...', data: { url: 'https://n8n-aipulse.up.railway.app/webhook/rapidtire', payload: args } });
                     
                     result = await scheduleWithWebhook({
                         name: args.name,

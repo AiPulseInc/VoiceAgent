@@ -6,25 +6,33 @@ interface VisualizerProps {
 
 const Visualizer: React.FC<VisualizerProps> = ({ isActive }) => {
   const barsRef = useRef<HTMLDivElement[]>([]);
+  const animationRef = useRef<number>(0);
 
   useEffect(() => {
     if (!isActive) {
+        if (animationRef.current) cancelAnimationFrame(animationRef.current);
         barsRef.current.forEach(bar => {
             if (bar) bar.style.height = '4px';
         });
         return;
     }
 
-    const interval = setInterval(() => {
+    const animate = () => {
       barsRef.current.forEach(bar => {
         if (bar) {
+          // Generowanie losowej wysokości dla efektu "mówienia"
           const height = Math.random() * 24 + 4;
           bar.style.height = `${height}px`;
         }
       });
-    }, 100);
+      animationRef.current = requestAnimationFrame(animate);
+    };
 
-    return () => clearInterval(interval);
+    animate();
+
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
   }, [isActive]);
 
   return (

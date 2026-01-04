@@ -269,7 +269,7 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, language, onClose }) => 
                 </div>
                 
                 <div className="p-2 bg-gray-900 border-t border-gray-800 text-[10px] text-gray-500 text-center">
-                    n8n Webhook: .../webhook-test/test
+                    n8n Webhook: .../webhook/rapidtire
                 </div>
             </div>
         )}
