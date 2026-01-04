@@ -7,6 +7,7 @@ import { X, Mic, MicOff, Phone, Settings, Terminal } from 'lucide-react';
 
 interface LiveDemoProps {
   agentType: AgentType;
+  language: 'en' | 'pl';
   onClose: () => void;
 }
 
@@ -32,7 +33,7 @@ const getTimeContext = () => {
   `;
 };
 
-const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
+const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, language, onClose }) => {
   const [isActive, setIsActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -45,6 +46,16 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   const config = agentType === AgentType.BOOKING ? AGENT_CONFIGS.BOOKING : AGENT_CONFIGS.OVERFLOW;
+
+  // Simple UI translations
+  const uiText = {
+      connecting: language === 'en' ? "Connecting to secure line..." : "Łączenie z bezpieczną linią...",
+      connected: language === 'en' ? "Connected! Say 'Hello' to start." : "Połączono! Powiedz 'Cześć' aby zacząć.",
+      micActive: language === 'en' ? "Microphone is active." : "Mikrofon jest aktywny.",
+      listening: language === 'en' ? "Listening..." : "Słucham...",
+      paused: language === 'en' ? "Paused" : "Wstrzymano",
+      accessing: language === 'en' ? "System accessing" : "Dostęp do systemu",
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -155,8 +166,8 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
             <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
                 {messages.length === 0 && !error && (
                     <div className="text-center text-gray-500 mt-20">
-                        <p>{isActive ? "Connected! Say 'Hello' to start." : "Connecting to secure line..."}</p>
-                        <p className="text-xs mt-2">Microphone is active.</p>
+                        <p>{isActive ? uiText.connected : uiText.connecting}</p>
+                        <p className="text-xs mt-2">{uiText.micActive}</p>
                     </div>
                 )}
                 
@@ -179,7 +190,7 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
                     <div className="flex justify-center">
                         <div className="bg-gray-800 text-orange-400 text-xs px-3 py-1 rounded-full flex items-center space-x-2 border border-orange-500/30 animate-pulse">
                             <Settings size={12} className="animate-spin" />
-                            <span>System accessing: {currentTool}...</span>
+                            <span>{uiText.accessing}: {currentTool}...</span>
                         </div>
                     </div>
                 )}
@@ -197,7 +208,7 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
                 <div className="w-full flex justify-between items-center px-4">
                     <div className="text-xs text-gray-500 flex items-center space-x-2">
                         <Visualizer isActive={isActive} />
-                        <span>{isActive ? 'Listening...' : 'Paused'}</span>
+                        <span>{isActive ? uiText.listening : uiText.paused}</span>
                     </div>
                     <span className="text-xs text-gray-600 uppercase tracking-widest">{config.voice}</span>
                 </div>

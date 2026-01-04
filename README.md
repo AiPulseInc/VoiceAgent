@@ -2,20 +2,30 @@
 
 A high-fidelity demonstration of a Voice AI implementation for a busy automotive workshop. This project utilizes the **Google Gemini Multimodal Live API** to create real-time, low-latency voice agents capable of handling appointment bookings and emergency triage calls via a web interface.
 
+Now features full **Bilingual Support (English/Polish)** and **Dark Mode**.
+
 ## 🌟 Key Features
 
-*   **Real-time Voice Conversation:** Uses WebSocket-based streaming (Gemini Live API) for natural, interruptible conversations.
+*   **Real-time Voice Conversation:** Uses WebSocket-based streaming (Gemini Live API) for natural, interruptible conversations with <500ms latency.
 *   **Dual Agent Personas:**
     *   **Booking Agent ("Zephyr"):** Specialized in calendar management, service durations, and checking bay availability.
     *   **Overflow Agent ("Puck"):** Specialized in after-hours lead capture and safety triage for emergency tire situations.
+*   **Bilingual UI & AI:**
+    *   Full interface translation between English and Polish.
+    *   Agents are prompted to detect the user's language and switch fluency automatically (e.g., answering "Dzień dobry" if addressed in Polish).
+*   **Adaptive UI:**
+    *   **Dark/Light Mode:** Fully responsive theme switching.
+    *   **Smooth Navigation:** Interactive scroll-to-section navigation.
 *   **Tool Calling & Webhooks:** The agents are grounded in reality; they do not hallucinate schedules. They call real external webhooks (n8n integration) to check availability and confirm bookings.
+*   **Live Dashboard Analytics:**
+    *   Visualizes "backend" state: Active Bookings, Callbacks, and Total Call Volume.
+    *   **Connection Tracking:** Now logs every voice session initiation to track total engagement, not just successful bookings.
 *   **System Diagnostics:** A built-in dashboard to test microphone hardware, API connectivity, and webhook payloads independently of the AI.
-*   **Live Dashboard Mockup:** Visualizes the "backend" state, showing bookings and callbacks as they are processed by the AI.
 
 ## 🛠️ Technology Stack
 
 *   **Frontend Framework:** React 19 (via ESM imports), TypeScript.
-*   **Styling:** Tailwind CSS.
+*   **Styling:** Tailwind CSS (configured for `class`-based Dark Mode).
 *   **AI Model:** Google Gemini 2.5 Flash Native Audio Preview (`gemini-2.5-flash-native-audio-preview-09-2025`).
 *   **SDK:** `@google/genai`.
 *   **Audio Processing:**
@@ -43,19 +53,20 @@ The agent is instructed via `systemInstruction` (in `constants.ts`) to never gue
 
 ## 📂 Component Structure
 
-*   **`App.tsx`**: Main entry point. Handles routing between the Landing Page and Diagnostics panel. Manages global API key state.
-*   **`services/geminiService.ts`**: The core engine. Manages WebSocket connection, audio encoding/decoding, and the event loop for handling tool calls.
-*   **`components/LiveDemo.tsx`**: The modal interface where the conversation happens. Displays the chat transcript, visualizer, and debug logs.
-*   **`components/SystemDiagnostics.tsx`**: A testing suite. Allows the user to verify their microphone and simulate webhook payloads manually to ensure the "backend" is alive before talking to the AI.
+*   **`App.tsx`**: Main entry point. Handles global state (Theme, Language, Stats), routing, and the landing page layout including the new "Benefits" and "How It Works" sections.
+*   **`services/geminiService.ts`**: The core engine. Manages WebSocket connection, audio encoding/decoding, call logging metrics, and the event loop for handling tool calls.
+*   **`components/LiveDemo.tsx`**: The modal interface where the conversation happens. Displays the chat transcript, visualizer, and debug logs. Adapts UI text based on selected language.
+*   **`components/AgentCard.tsx`**: Reusable card component for agent selection, supports translation props.
+*   **`components/SystemDiagnostics.tsx`**: A testing suite. Allows the user to verify their microphone and simulate webhook payloads manually.
 *   **`utils/audioUtils.ts`**: Low-level audio helpers. Contains the `RecorderProcessor` string (AudioWorklet) to avoid external file dependencies.
-*   **`constants.ts`**: Contains the critical `systemInstruction` prompts that define the personalities and strict rules for the agents.
+*   **`utils/mockBackend.ts`**: In-memory store for dashboard visualization. Tracks `bookings`, `callbacks`, and `totalCalls`.
 
 ## 🚀 Setup & Usage
 
 1.  **Environment Variables:**
     The application requires a Google Gemini API Key.
     *   If running locally, set `process.env.API_KEY`.
-    *   If running in a browser environment (like StackBlitz), the app includes a "Select API Key" flow using `window.aistudio`.
+    *   If running in a browser environment (like StackBlitz), the app includes a "Select API Key" flow using `window.aistudio` or falls back to a demo key if configured.
 
 2.  **Permissions:**
     The browser will request Microphone access upon starting the Diagnostics or the Live Demo.
@@ -68,19 +79,13 @@ The agent is instructed via `systemInstruction` (in `constants.ts`) to never gue
 To transition this from a demo to a production-grade enterprise solution, the following features would be implemented:
 
 1.  **Telephony Integration (Twilio/Vonage):**
-    *   Currently, this is a "Web Call" (Browser-to-AI).
     *   **Upgrade:** Use a WebSocket relay server (Node.js/Python) to connect a real phone number (Twilio Stream) directly to the Gemini Live API. This allows customers to call via regular GSM/Landlines.
 
 2.  **Database Persistence:**
-    *   Currently, bookings are stored in a volatile in-memory array (`utils/mockBackend.ts`).
-    *   **Upgrade:** Connect the webhook to a real SQL database (PostgreSQL) or a CRM (HubSpot/Salesforce) to manage real customer records.
+    *   **Upgrade:** Connect the webhook to a real SQL database (PostgreSQL) or a CRM (HubSpot/Salesforce) to manage real customer records instead of the in-memory mock backend.
 
 3.  **Interrupt Handling & Latency:**
     *   **Upgrade:** Implement aggressive echo cancellation and "barge-in" handling server-side to allow the user to interrupt the AI more naturally during long sentences.
 
 4.  **Authentication:**
     *   **Upgrade:** Add an Admin Dashboard with login (Auth0/Firebase) for shop managers to view transcripts, listen to call recordings, and configure agent prompts.
-
-5.  **Multi-Language Support:**
-    *   The prompt currently instructs the agent to speak Polish if addressed in Polish.
-    *   **Upgrade:** Explicitly detect locale metadata to switch system instructions dynamically for better cultural nuance.

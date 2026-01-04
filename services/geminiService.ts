@@ -1,6 +1,6 @@
 import { GoogleGenAI, LiveServerMessage, Modality, FunctionDeclaration, Type } from '@google/genai';
 import { floatTo16BitPCM, base64ToArrayBuffer, RECORDER_WORKLET_CODE } from '../utils/audioUtils';
-import { scheduleWithWebhook, logCallback } from '../utils/mockBackend';
+import { scheduleWithWebhook, logCallback, logCallStart } from '../utils/mockBackend';
 
 export interface LogEntry {
   type: 'info' | 'tool_req' | 'tool_res' | 'error' | 'webhook';
@@ -109,6 +109,7 @@ export class GeminiLiveService {
           onopen: () => {
             options.onLog({ type: 'info', message: 'Session Connected' });
             this.isConnected = true;
+            logCallStart(); // Log stats
             this.startAudioInput();
           },
           onmessage: async (message: LiveServerMessage) => {
@@ -124,13 +125,11 @@ export class GeminiLiveService {
             const inputTranscript = message.serverContent?.inputTranscription?.text;
             if (inputTranscript) {
                 options.onTranscript('user', inputTranscript);
-                // Removed chat logging to avoid duplication
             }
 
             const outputTranscript = message.serverContent?.outputTranscription?.text;
             if (outputTranscript) {
                 options.onTranscript('model', outputTranscript);
-                // Removed chat logging to avoid duplication
             }
 
             // Function Calls
@@ -148,7 +147,6 @@ export class GeminiLiveService {
                 try {
                   const args = fc.args as any;
                   if (fc.name === 'scheduleAppointment') {
-                    // This calls the webhook
                     options.onLog({ type: 'webhook', message: 'Sending POST request...', data: { url: 'https://n8n-aipulse.up.railway.app/webhook-test/test', payload: args } });
                     
                     result = await scheduleWithWebhook({
@@ -174,7 +172,6 @@ export class GeminiLiveService {
                   options.onLog({ type: 'error', message: `Tool Execution Failed: ${errMessage}` });
                 }
 
-                // Send tool response
                 this.sessionPromise?.then(session => {
                   session.sendToolResponse({
                     functionResponses: [{
@@ -232,6 +229,7 @@ export class GeminiLiveService {
     if (!this.audioContext) throw new Error("No context");
     const arrayBuffer = base64ToArrayBuffer(base64);
     
+    // Decode PCM16 (24kHz typically from Gemini) to Float32 for Web Audio
     const pcm16 = new Int16Array(arrayBuffer);
     const float32 = new Float32Array(pcm16.length);
     for(let i=0; i<pcm16.length; i++) {

@@ -3,6 +3,7 @@ import { Booking, ServiceType, LoggedCallback } from '../types';
 // In-memory store for Dashboard visualization
 let bookings: Booking[] = [];
 let callbacks: LoggedCallback[] = [];
+let totalCalls = 0; // New metric for all initiated calls
 
 interface WebhookPayload {
     name: string;
@@ -12,6 +13,12 @@ interface WebhookPayload {
     time: string;
     request: string;
 }
+
+// Called when Gemini session opens
+export const logCallStart = () => {
+    totalCalls++;
+    console.log("📞 Call Started. Total:", totalCalls);
+};
 
 export const scheduleWithWebhook = async (data: WebhookPayload) => {
     // LOG START
@@ -96,6 +103,7 @@ export const logCallback = (data: Omit<LoggedCallback, 'id' | 'timestamp'>) => {
 }
 
 export const getDashboardStats = () => ({
+    totalCalls, // Exported to UI
     bookingsCount: bookings.length,
     callbacksCount: callbacks.length,
     recentBookings: bookings.slice(-3),
