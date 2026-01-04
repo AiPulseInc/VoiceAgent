@@ -1,63 +1,18 @@
 import React from 'react';
 import { AgentType } from '../types';
 import { Phone, Clock, CalendarCheck } from 'lucide-react';
+import { AgentCardContent } from '../data/config.interface';
 
 interface AgentCardProps {
   type: AgentType;
-  language: 'en' | 'pl';
+  content: AgentCardContent;
+  btnText: string;
   onTest: (type: AgentType) => void;
 }
 
-const CARD_CONTENT = {
-  en: {
-    BOOKING: {
-      name: "Front Desk Agent",
-      description: "Specialized in booking appointments for seasonal tire change.",
-      capabilities: [
-        { text: "Real-time bay management", color: "text-blue-500" },
-        { text: "Complex service scheduling", color: "text-blue-500" },
-        { text: "Price & duration estimation", color: "text-blue-500" }
-      ]
-    },
-    OVERFLOW: {
-      name: "After-Hours / Overflow Agent",
-      description: "Handles missed calls and emergency triage efficiently.",
-      capabilities: [
-        { text: "After-hours lead capture", color: "text-orange-500" },
-        { text: "Emergency safety triage", color: "text-orange-500" },
-        { text: "Quick callback logging", color: "text-orange-500" }
-      ]
-    }
-  },
-  pl: {
-    BOOKING: {
-      name: "Recepcja / Rezerwacje",
-      description: "Specjalizuje się w umawianiu wizyt na sezonową wymianę opon.",
-      capabilities: [
-        { text: "Zarządzanie stanowiskami w czasie rzeczywistym", color: "text-blue-500" },
-        { text: "Złożone harmonogramy usług", color: "text-blue-500" },
-        { text: "Szacowanie ceny i czasu trwania", color: "text-blue-500" }
-      ]
-    },
-    OVERFLOW: {
-      name: "Agent Po Godzinach / Awaryjny",
-      description: "Sprawnie obsługuje nieodebrane połączenia i segregację awaryjną.",
-      capabilities: [
-        { text: "Przechwytywanie zgłoszeń po godzinach", color: "text-orange-500" },
-        { text: "Segregacja bezpieczeństwa (Triage)", color: "text-orange-500" },
-        { text: "Szybkie logowanie próśb o kontakt", color: "text-orange-500" }
-      ]
-    }
-  }
-};
-
-const AgentCard: React.FC<AgentCardProps> = ({ type, language, onTest }) => {
+const AgentCard: React.FC<AgentCardProps> = ({ type, content, btnText, onTest }) => {
   const isBooking = type === AgentType.BOOKING;
   
-  // Select content based on language and agent type
-  const content = CARD_CONTENT[language][type];
-  const btnText = language === 'en' ? 'Test this voice agent' : 'Przetestuj agenta głosowego';
-
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-300 flex flex-col h-full shadow-lg relative overflow-hidden group">
       

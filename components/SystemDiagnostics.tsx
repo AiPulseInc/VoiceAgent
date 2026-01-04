@@ -22,9 +22,10 @@ interface WebhookForm {
 
 interface SystemDiagnosticsProps {
   onBack: () => void;
+  webhookUrl: string; // NEW: Prop from parent
 }
 
-const SystemDiagnostics: React.FC<SystemDiagnosticsProps> = ({ onBack }) => {
+const SystemDiagnostics: React.FC<SystemDiagnosticsProps> = ({ onBack, webhookUrl }) => {
   // --- Connectivity Test State ---
   const [steps, setSteps] = useState<TestStep[]>([
     { id: 'auth', label: 'API Authorization', status: 'pending', icon: ShieldCheck },
@@ -41,7 +42,7 @@ const SystemDiagnostics: React.FC<SystemDiagnosticsProps> = ({ onBack }) => {
     email: 'alex.driver@example.com',
     date: new Date().toISOString().split('T')[0], // Today YYYY-MM-DD
     time: '14:00',
-    request: 'Winter tire swap'
+    request: 'System Check'
   });
   const [webhookStatus, setWebhookStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [webhookLog, setWebhookLog] = useState<string[]>([]);
@@ -93,6 +94,7 @@ const SystemDiagnostics: React.FC<SystemDiagnosticsProps> = ({ onBack }) => {
         await serviceRef.current.connect({
             systemInstruction: "Ping",
             voiceName: "Zephyr",
+            webhookUrl: webhookUrl, // Pass for consistency, though unused in ping
             onAudioData: () => {},
             onTranscript: () => {},
             onToolUse: () => {},
@@ -117,10 +119,10 @@ const SystemDiagnostics: React.FC<SystemDiagnosticsProps> = ({ onBack }) => {
       
       const payload = { ...webhookForm };
       addToLog(`📦 Payload Prepared:\n${JSON.stringify(payload, null, 2)}`);
-      addToLog(`📡 Target: https://n8n-aipulse.up.railway.app/webhook/rapidtire`);
+      addToLog(`📡 Target: ${webhookUrl}`);
 
       try {
-          const result = await scheduleWithWebhook(payload);
+          const result = await scheduleWithWebhook(payload, webhookUrl);
           
           if (result && result.result) {
               addToLog(`✅ Response Received: ${JSON.stringify(result)}`);

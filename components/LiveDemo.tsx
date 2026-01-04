@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { GeminiLiveService, LogEntry } from '../services/geminiService';
-import { AGENT_CONFIGS } from '../constants';
 import { AgentType, ChatMessage } from '../types';
+import { AgentConfig } from '../data/config.interface';
 import Visualizer from './Visualizer';
 import { X, Mic, MicOff, Phone, Settings, Terminal } from 'lucide-react';
 
 interface LiveDemoProps {
   agentType: AgentType;
+  config: AgentConfig; // Passed from parent based on selection
+  webhookUrl: string;  // NEW: Passed from parent config
   language: 'en' | 'pl';
   onClose: () => void;
 }
@@ -33,7 +35,7 @@ const getTimeContext = () => {
   `;
 };
 
-const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, language, onClose }) => {
+const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, config, webhookUrl, language, onClose }) => {
   const [isActive, setIsActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -44,8 +46,6 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, language, onClose }) => 
   const serviceRef = useRef<GeminiLiveService | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const logsEndRef = useRef<HTMLDivElement>(null);
-
-  const config = agentType === AgentType.BOOKING ? AGENT_CONFIGS.BOOKING : AGENT_CONFIGS.OVERFLOW;
 
   // Simple UI translations
   const uiText = {
@@ -78,6 +78,7 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, language, onClose }) => 
       await serviceRef.current.connect({
         systemInstruction: config.systemInstruction + getTimeContext(),
         voiceName: config.voice,
+        webhookUrl: webhookUrl, // Pass to service
         onAudioData: () => {
             // Visualizer handled by CSS via analysis or mock
         },
@@ -110,7 +111,7 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, language, onClose }) => 
     } catch (e) {
       setError("Failed to start session.");
     }
-  }, [config]);
+  }, [config, webhookUrl]);
 
   const endSession = useCallback(() => {
     if (serviceRef.current) {
@@ -269,7 +270,7 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, language, onClose }) => 
                 </div>
                 
                 <div className="p-2 bg-gray-900 border-t border-gray-800 text-[10px] text-gray-500 text-center">
-                    n8n Webhook: .../webhook/rapidtire
+                    Webhook Target: {config.name} Backend
                 </div>
             </div>
         )}

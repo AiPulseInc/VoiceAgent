@@ -3,16 +3,21 @@ import AgentCard from './components/AgentCard';
 import LiveDemo from './components/LiveDemo';
 import SystemDiagnostics from './components/SystemDiagnostics';
 import { AgentType } from './types';
-import { TRANSLATIONS } from './constants';
 import { getDashboardStats } from './utils/mockBackend';
+import { DemoConfig } from './data/config.interface';
 import { 
   Wrench, PhoneCall, ShieldCheck, Activity, Key, Stethoscope, 
   Moon, Sun, Globe, Zap, Clock, TrendingUp, 
   Database, BarChart3, Timer, Award, PieChart,
-  Facebook, Twitter, Linkedin, Instagram, MapPin, Mail, Download, Loader2
+  Facebook, Twitter, Linkedin, Instagram, MapPin, Mail, Shield, ArrowLeft
 } from 'lucide-react';
 
-const App: React.FC = () => {
+interface AppProps {
+  config: DemoConfig;
+  onBack: () => void;
+}
+
+const App: React.FC<AppProps> = ({ config, onBack }) => {
   const [activeDemo, setActiveDemo] = useState<AgentType | null>(null);
   const [currentView, setCurrentView] = useState<'landing' | 'diagnostics'>('landing');
   const [stats, setStats] = useState(getDashboardStats());
@@ -23,10 +28,10 @@ const App: React.FC = () => {
   const [language, setLanguage] = useState<'en' | 'pl'>('en');
 
   // Placeholder for Image Gen - keeping consistent with previous state although not main focus
-  const [heroImage, setHeroImage] = useState<string>("rapid-tire-hero.jpg");
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [heroImage, setHeroImage] = useState<string>(config.images.hero);
 
-  const t = TRANSLATIONS[language];
+  const t = config.content[language];
+  const theme = config.theme;
 
   // Apply theme class to wrapper
   useEffect(() => {
@@ -36,6 +41,11 @@ const App: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
+  // Update hero image if config changes
+  useEffect(() => {
+    setHeroImage(config.images.hero);
+  }, [config.images.hero]);
 
   // Poll stats for dashboard liveliness
   useEffect(() => {
@@ -110,20 +120,11 @@ const App: React.FC = () => {
     }, 150);
   };
 
-  // Simplified image handler to maintain compatibility without full image service code
-  const handleGenerateImage = async () => {
-      // Placeholder for actual implementation if requested
-      setIsGeneratingImage(true);
-      setTimeout(() => setIsGeneratingImage(false), 1000);
-  };
-
-  const handleDownloadImage = () => {
-    const link = document.createElement('a');
-    link.href = heroImage;
-    link.download = 'rapidtire-hero-ai.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // Dynamic icon renderer
+  const BrandIcon = () => {
+    if (theme.icon === 'Stethoscope') return <Stethoscope className="text-white h-5 w-5" />;
+    if (theme.icon === 'Shield') return <Shield className="text-white h-5 w-5" />;
+    return <Wrench className="text-white h-5 w-5" />;
   };
 
   return (
@@ -132,25 +133,34 @@ const App: React.FC = () => {
       <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div 
-              className="flex items-center space-x-2 cursor-pointer" 
-              onClick={() => { setCurrentView('landing'); window.scrollTo(0,0); }}
-            >
-              <div className="bg-red-600 p-2 rounded-lg">
-                <Wrench className="text-white h-5 w-5" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">RapidTire <span className="text-red-500">AI</span></span>
+            <div className="flex items-center space-x-4">
+                <button 
+                    onClick={onBack}
+                    className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                    title="Back to Hub"
+                >
+                    <ArrowLeft size={20} />
+                </button>
+                <div 
+                className="flex items-center space-x-2 cursor-pointer" 
+                onClick={() => { setCurrentView('landing'); window.scrollTo(0,0); }}
+                >
+                <div className={`${theme.primaryBg} p-2 rounded-lg`}>
+                    <BrandIcon />
+                </div>
+                <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{config.name} <span className={theme.primaryText}>AI</span></span>
+                </div>
             </div>
             
             <div className="flex items-center space-x-4 md:space-x-8 text-sm font-medium text-gray-600 dark:text-gray-300">
-              <button onClick={() => scrollToSection('agents')} className="hover:text-red-600 dark:hover:text-white transition hidden md:block">{t.navAgents}</button>
-              <button onClick={() => scrollToSection('dashboard')} className="hover:text-red-600 dark:hover:text-white transition hidden md:block">{t.navDashboard}</button>
-              <button onClick={() => scrollToSection('benefits')} className="hover:text-red-600 dark:hover:text-white transition hidden md:block">{t.navBenefits}</button>
-              <button onClick={() => scrollToSection('how-it-works')} className="hover:text-red-600 dark:hover:text-white transition hidden md:block">{t.navHow}</button>
+              <button onClick={() => scrollToSection('agents')} className={`hover:${theme.primaryText} dark:hover:text-white transition hidden md:block`}>{t.navAgents}</button>
+              <button onClick={() => scrollToSection('dashboard')} className={`hover:${theme.primaryText} dark:hover:text-white transition hidden md:block`}>{t.navDashboard}</button>
+              <button onClick={() => scrollToSection('benefits')} className={`hover:${theme.primaryText} dark:hover:text-white transition hidden md:block`}>{t.navBenefits}</button>
+              <button onClick={() => scrollToSection('how-it-works')} className={`hover:${theme.primaryText} dark:hover:text-white transition hidden md:block`}>{t.navHow}</button>
               
               <button 
                 onClick={() => setCurrentView('diagnostics')} 
-                className={`flex items-center space-x-1 transition ${currentView === 'diagnostics' ? 'text-red-600 dark:text-white' : 'hover:text-red-600 dark:hover:text-white'}`}
+                className={`flex items-center space-x-1 transition ${currentView === 'diagnostics' ? `${theme.primaryText} dark:text-white` : `hover:${theme.primaryText} dark:hover:text-white`}`}
               >
                 <Stethoscope size={16} />
                 <span className="hidden sm:inline">{t.navDiagnostics}</span>
@@ -190,7 +200,7 @@ const App: React.FC = () => {
 
       {/* Main Content View Switcher */}
       {currentView === 'diagnostics' ? (
-        <SystemDiagnostics onBack={() => setCurrentView('landing')} />
+        <SystemDiagnostics onBack={() => setCurrentView('landing')} webhookUrl={config.webhookUrl} />
       ) : (
         <>
           {/* Hero Section */}
@@ -213,7 +223,7 @@ const App: React.FC = () => {
                   {t.heroSubtitle}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <button onClick={() => scrollToSection('agents')} className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition shadow-xl shadow-red-600/20">
+                  <button onClick={() => scrollToSection('agents')} className={`inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-md text-white ${theme.primaryBg} hover:opacity-90 transition shadow-xl`}>
                     {t.cta}
                   </button>
                   <div className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-gray-700 dark:text-gray-300">
@@ -237,8 +247,18 @@ const App: React.FC = () => {
               </div>
               
               <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <AgentCard type={AgentType.BOOKING} language={language} onTest={handleTestAgent} />
-                <AgentCard type={AgentType.OVERFLOW} language={language} onTest={handleTestAgent} />
+                <AgentCard 
+                    type={AgentType.BOOKING} 
+                    content={t.agents[AgentType.BOOKING]}
+                    btnText={language === 'en' ? 'Test this voice agent' : 'Przetestuj agenta głosowego'}
+                    onTest={handleTestAgent} 
+                />
+                <AgentCard 
+                    type={AgentType.OVERFLOW} 
+                    content={t.agents[AgentType.OVERFLOW]}
+                    btnText={language === 'en' ? 'Test this voice agent' : 'Przetestuj agenta głosowego'}
+                    onTest={handleTestAgent} 
+                />
               </div>
             </div>
           </section>
@@ -340,7 +360,7 @@ const App: React.FC = () => {
                         { icon: BarChart3, title: t.step6Title, desc: t.step6Desc }
                     ].map((item, i) => (
                         <div key={i} className="text-center group p-4">
-                            <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-600 dark:text-red-500 border border-gray-200 dark:border-gray-700 shadow-lg group-hover:scale-110 transition-transform">
+                            <div className={`w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6 ${theme.primaryText} border border-gray-200 dark:border-gray-700 shadow-lg group-hover:scale-110 transition-transform`}>
                                 <item.icon size={32} />
                             </div>
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{item.title}</h3>
@@ -361,10 +381,10 @@ const App: React.FC = () => {
             {/* Brand Column */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <div className="bg-red-600 p-2 rounded-lg">
-                  <Wrench className="text-white h-4 w-4" />
+                <div className={`${theme.primaryBg} p-2 rounded-lg`}>
+                  <BrandIcon />
                 </div>
-                <span className="text-lg font-bold text-gray-900 dark:text-white">RapidTire <span className="text-red-500">AI</span></span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">{config.name} <span className={theme.primaryText}>AI</span></span>
               </div>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 {t.footerDesc}
@@ -381,10 +401,10 @@ const App: React.FC = () => {
             <div>
               <h3 className="font-bold text-gray-900 dark:text-white mb-4 uppercase tracking-wider text-xs">{t.footerLinks}</h3>
               <ul className="space-y-3">
-                <li><button onClick={() => scrollToSection('agents')} className="text-gray-600 dark:text-gray-400 hover:text-red-500 transition">{t.navAgents}</button></li>
-                <li><button onClick={() => scrollToSection('dashboard')} className="text-gray-600 dark:text-gray-400 hover:text-red-500 transition">{t.navDashboard}</button></li>
-                <li><button onClick={() => scrollToSection('benefits')} className="text-gray-600 dark:text-gray-400 hover:text-red-500 transition">{t.navBenefits}</button></li>
-                <li><button onClick={() => scrollToSection('how-it-works')} className="text-gray-600 dark:text-gray-400 hover:text-red-500 transition">{t.navHow}</button></li>
+                <li><button onClick={() => scrollToSection('agents')} className={`text-gray-600 dark:text-gray-400 hover:${theme.primaryText} transition`}>{t.navAgents}</button></li>
+                <li><button onClick={() => scrollToSection('dashboard')} className={`text-gray-600 dark:text-gray-400 hover:${theme.primaryText} transition`}>{t.navDashboard}</button></li>
+                <li><button onClick={() => scrollToSection('benefits')} className={`text-gray-600 dark:text-gray-400 hover:${theme.primaryText} transition`}>{t.navBenefits}</button></li>
+                <li><button onClick={() => scrollToSection('how-it-works')} className={`text-gray-600 dark:text-gray-400 hover:${theme.primaryText} transition`}>{t.navHow}</button></li>
               </ul>
             </div>
 
@@ -392,9 +412,9 @@ const App: React.FC = () => {
             <div>
               <h3 className="font-bold text-gray-900 dark:text-white mb-4 uppercase tracking-wider text-xs">{t.footerLegal}</h3>
               <ul className="space-y-3">
-                <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-red-500 transition">{t.footerPrivacy}</a></li>
-                <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-red-500 transition">{t.footerTerms}</a></li>
-                <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-red-500 transition">{t.footerCookies}</a></li>
+                <li><a href="#" className={`text-gray-600 dark:text-gray-400 hover:${theme.primaryText} transition`}>{t.footerPrivacy}</a></li>
+                <li><a href="#" className={`text-gray-600 dark:text-gray-400 hover:${theme.primaryText} transition`}>{t.footerTerms}</a></li>
+                <li><a href="#" className={`text-gray-600 dark:text-gray-400 hover:${theme.primaryText} transition`}>{t.footerCookies}</a></li>
               </ul>
             </div>
 
@@ -403,7 +423,7 @@ const App: React.FC = () => {
               <h3 className="font-bold text-gray-900 dark:text-white mb-4 uppercase tracking-wider text-xs">{t.footerContact}</h3>
               <ul className="space-y-4">
                 <li className="flex items-start space-x-3 text-gray-600 dark:text-gray-400">
-                  <MapPin size={18} className="shrink-0 mt-0.5 text-red-500" />
+                  <MapPin size={18} className={`shrink-0 mt-0.5 ${theme.primaryText}`} />
                   <span>
                     {t.footerAddress}<br/>
                     {t.footerStreet}<br/>
@@ -411,11 +431,11 @@ const App: React.FC = () => {
                   </span>
                 </li>
                 <li className="flex items-center space-x-3 text-gray-600 dark:text-gray-400">
-                  <Mail size={18} className="shrink-0 text-red-500" />
-                  <a href="mailto:contact@rapidtire.ai" className="hover:text-white transition">contact@rapidtire.ai</a>
+                  <Mail size={18} className={`shrink-0 ${theme.primaryText}`} />
+                  <a href={`mailto:contact@${config.id}.ai`} className="hover:text-white transition">contact@{config.id}.ai</a>
                 </li>
                  <li className="flex items-center space-x-3 text-gray-600 dark:text-gray-400">
-                  <PhoneCall size={18} className="shrink-0 text-red-500" />
+                  <PhoneCall size={18} className={`shrink-0 ${theme.primaryText}`} />
                   <span>+48 22 555 01 99</span>
                 </li>
               </ul>
@@ -424,7 +444,7 @@ const App: React.FC = () => {
           </div>
           
           <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-xs">
-            <p>&copy; 2026 RapidTire Auto Service Demo. Powered by Google Gemini Live.</p>
+            <p>&copy; 2026 {config.name} Demo. Powered by Google Gemini Live.</p>
             <div className="flex items-center space-x-4 mt-4 md:mt-0">
                <span>{t.ver}</span>
             </div>
@@ -435,7 +455,9 @@ const App: React.FC = () => {
       {/* Live Demo Modal */}
       {activeDemo && (
         <LiveDemo 
-            agentType={activeDemo} 
+            agentType={activeDemo}
+            config={config.agents[activeDemo]} 
+            webhookUrl={config.webhookUrl}
             language={language}
             onClose={() => setActiveDemo(null)} 
         />

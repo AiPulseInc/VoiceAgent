@@ -11,6 +11,7 @@ export interface LogEntry {
 interface ConnectOptions {
   systemInstruction: string;
   voiceName: string;
+  webhookUrl: string; // NEW: Dynamic URL
   onAudioData: (buffer: AudioBuffer) => void;
   onTranscript: (role: 'user' | 'model', text: string) => void;
   onToolUse: (toolName: string, status: 'started' | 'finished', result?: any) => void;
@@ -149,7 +150,8 @@ export class GeminiLiveService {
                 try {
                   const args = fc.args as any;
                   if (fc.name === 'scheduleAppointment') {
-                    options.onLog({ type: 'webhook', message: 'Sending POST request...', data: { url: 'https://n8n-aipulse.up.railway.app/webhook/rapidtire', payload: args } });
+                    // Use Dynamic Webhook URL from Options
+                    options.onLog({ type: 'webhook', message: 'Sending POST request...', data: { url: options.webhookUrl, payload: args } });
                     
                     result = await scheduleWithWebhook({
                         name: args.name,
@@ -158,7 +160,7 @@ export class GeminiLiveService {
                         date: args.date,
                         time: args.time,
                         request: args.request
-                    });
+                    }, options.webhookUrl);
 
                     options.onLog({ type: 'webhook', message: 'Webhook Response', data: result });
 

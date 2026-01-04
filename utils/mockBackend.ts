@@ -20,16 +20,17 @@ export const logCallStart = () => {
     console.log("📞 Call Started. Total:", totalCalls);
 };
 
-export const scheduleWithWebhook = async (data: WebhookPayload) => {
+export const scheduleWithWebhook = async (data: WebhookPayload, targetUrl: string) => {
     // LOG START
     console.log("🚀 [Webhook] Preparing to send POST request to n8n");
+    console.log(`📡 Target: ${targetUrl}`);
     console.log("📦 [Webhook] Payload:", data);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000); 
 
     try {
-        const response = await fetch('https://n8n-aipulse.up.railway.app/webhook/rapidtire', {
+        const response = await fetch(targetUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -64,13 +65,14 @@ export const scheduleWithWebhook = async (data: WebhookPayload) => {
         console.log("✅ [Webhook] Success. Parsed JSON:", json);
         
         // Side effect: Add to local dashboard Mock for visualization
-        if (json.status && (String(json.status).toLowerCase().includes('confirmed') || String(json.status).toLowerCase().includes('potwierdzona'))) {
+        // Logic generalized: any success status counts as booking for demo purposes
+        if (json.status) {
             bookings.push({
                 id: Math.random().toString(36).substring(7),
                 customerName: data.name,
                 phoneNumber: data.phone,
                 carDetails: data.request,
-                serviceType: ServiceType.TIRE_CHANGE, // Default for display
+                serviceType: ServiceType.TIRE_CHANGE, // Simplified for demo
                 bayId: 'A',
                 startTime: new Date().toISOString(),
                 durationMinutes: 40
