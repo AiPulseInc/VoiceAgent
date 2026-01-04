@@ -43,12 +43,12 @@ The agent is instructed via `systemInstruction` (in `constants.ts`) to never gue
 
 ## 📂 Component Structure
 
-*   **`App.tsx`**: Main entry point. Handles routing, themes (Dark/Light), localization (EN/PL), and page layout.
+*   **`App.tsx`**: Main entry point. Handles routing between the Landing Page and Diagnostics panel. Manages global API key state.
 *   **`services/geminiService.ts`**: The core engine. Manages WebSocket connection, audio encoding/decoding, and the event loop for handling tool calls.
 *   **`components/LiveDemo.tsx`**: The modal interface where the conversation happens. Displays the chat transcript, visualizer, and debug logs.
 *   **`components/SystemDiagnostics.tsx`**: A testing suite. Allows the user to verify their microphone and simulate webhook payloads manually to ensure the "backend" is alive before talking to the AI.
 *   **`utils/audioUtils.ts`**: Low-level audio helpers. Contains the `RecorderProcessor` string (AudioWorklet) to avoid external file dependencies.
-*   **`constants.ts`**: Contains the critical `systemInstruction` prompts that define the personalities and strict rules for the agents (Localized).
+*   **`constants.ts`**: Contains the critical `systemInstruction` prompts that define the personalities and strict rules for the agents.
 
 ## 🚀 Setup & Usage
 
@@ -82,5 +82,5 @@ To transition this from a demo to a production-grade enterprise solution, the fo
     *   **Upgrade:** Add an Admin Dashboard with login (Auth0/Firebase) for shop managers to view transcripts, listen to call recordings, and configure agent prompts.
 
 5.  **Multi-Language Support:**
-    *   **Implemented:** Basic EN/PL support.
+    *   The prompt currently instructs the agent to speak Polish if addressed in Polish.
     *   **Upgrade:** Explicitly detect locale metadata to switch system instructions dynamically for better cultural nuance.

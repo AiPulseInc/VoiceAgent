@@ -3,7 +3,6 @@ import { Booking, ServiceType, LoggedCallback } from '../types';
 // In-memory store for Dashboard visualization
 let bookings: Booking[] = [];
 let callbacks: LoggedCallback[] = [];
-let totalCalls = 0; // Track every session attempt
 
 interface WebhookPayload {
     name: string;
@@ -13,12 +12,6 @@ interface WebhookPayload {
     time: string;
     request: string;
 }
-
-// New function to log the start of any call (session)
-export const logCallStart = () => {
-    totalCalls++;
-    console.log("📞 Call Session Started. Total count:", totalCalls);
-};
 
 export const scheduleWithWebhook = async (data: WebhookPayload) => {
     // LOG START
@@ -64,9 +57,7 @@ export const scheduleWithWebhook = async (data: WebhookPayload) => {
         console.log("✅ [Webhook] Success. Parsed JSON:", json);
         
         // Side effect: Add to local dashboard Mock for visualization
-        // Logic relaxed slightly to accept typical success responses
-        const statusStr = String(json.status || '').toLowerCase();
-        if (statusStr.includes('confirmed') || statusStr.includes('potwierdzona') || statusStr.includes('success') || statusStr.includes('ok')) {
+        if (json.status && (String(json.status).toLowerCase().includes('confirmed') || String(json.status).toLowerCase().includes('potwierdzona'))) {
             bookings.push({
                 id: Math.random().toString(36).substring(7),
                 customerName: data.name,
@@ -105,7 +96,6 @@ export const logCallback = (data: Omit<LoggedCallback, 'id' | 'timestamp'>) => {
 }
 
 export const getDashboardStats = () => ({
-    totalCalls,
     bookingsCount: bookings.length,
     callbacksCount: callbacks.length,
     recentBookings: bookings.slice(-3),

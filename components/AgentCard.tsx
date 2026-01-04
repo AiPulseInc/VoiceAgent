@@ -1,46 +1,45 @@
 import React from 'react';
 import { AgentType } from '../types';
-import { getAgentConfigs } from '../constants';
-import { Phone, Clock, CalendarCheck } from 'lucide-react';
+import { AGENT_CONFIGS } from '../constants';
+import { Phone, Clock, AlertTriangle, CalendarCheck } from 'lucide-react';
 
 interface AgentCardProps {
   type: AgentType;
-  language: 'en' | 'pl';
   onTest: (type: AgentType) => void;
 }
 
-const AgentCard: React.FC<AgentCardProps> = ({ type, language, onTest }) => {
+const AgentCard: React.FC<AgentCardProps> = ({ type, onTest }) => {
   const isBooking = type === AgentType.BOOKING;
-  const config = isBooking ? getAgentConfigs(language).BOOKING : getAgentConfigs(language).OVERFLOW;
+  const config = isBooking ? AGENT_CONFIGS.BOOKING : AGENT_CONFIGS.OVERFLOW;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-300 flex flex-col h-full shadow-lg relative overflow-hidden group">
+    <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700 hover:border-gray-500 transition-all duration-300 flex flex-col h-full shadow-lg relative overflow-hidden group">
       
       {/* Background decoration */}
       <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${isBooking ? 'from-blue-500/10' : 'from-orange-500/10'} to-transparent rounded-bl-full pointer-events-none`} />
 
       <div className="mb-4">
-        <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${isBooking ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400' : 'bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400'}`}>
+        <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${isBooking ? 'bg-blue-900/50 text-blue-400' : 'bg-orange-900/50 text-orange-400'}`}>
             {isBooking ? <CalendarCheck size={24} /> : <Clock size={24} />}
         </div>
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{config.name}</h3>
-        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{config.description}</p>
+        <h3 className="text-xl font-bold text-white mb-2">{config.name}</h3>
+        <p className="text-gray-400 text-sm leading-relaxed">{config.description}</p>
       </div>
 
       <div className="flex-1 space-y-3 mb-6">
-        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{language === 'pl' ? 'Możliwości' : 'Capabilities'}</h4>
-        <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Capabilities</h4>
+        <ul className="space-y-2 text-sm text-gray-300">
             {isBooking ? (
                 <>
-                    <li className="flex items-start"><span className="mr-2 text-blue-500">•</span> {language === 'pl' ? 'Zarządzanie stanowiskami w czasie rzeczywistym' : 'Real-time bay management'}</li>
-                    <li className="flex items-start"><span className="mr-2 text-blue-500">•</span> {language === 'pl' ? 'Planowanie złożonych usług' : 'Complex service scheduling'}</li>
-                    <li className="flex items-start"><span className="mr-2 text-blue-500">•</span> {language === 'pl' ? 'Szacowanie ceny i czasu trwania' : 'Price & duration estimation'}</li>
+                    <li className="flex items-start"><span className="mr-2 text-blue-500">•</span> Real-time bay management</li>
+                    <li className="flex items-start"><span className="mr-2 text-blue-500">•</span> Complex service scheduling</li>
+                    <li className="flex items-start"><span className="mr-2 text-blue-500">•</span> Price & duration estimation</li>
                 </>
             ) : (
                 <>
-                     <li className="flex items-start"><span className="mr-2 text-orange-500">•</span> {language === 'pl' ? 'Przechwytywanie zgłoszeń po godzinach' : 'After-hours lead capture'}</li>
-                     <li className="flex items-start"><span className="mr-2 text-orange-500">•</span> {language === 'pl' ? 'Segregacja zgłoszeń awaryjnych' : 'Emergency safety triage'}</li>
-                     <li className="flex items-start"><span className="mr-2 text-orange-500">•</span> {language === 'pl' ? 'Szybkie logowanie próśb o kontakt' : 'Quick callback logging'}</li>
+                     <li className="flex items-start"><span className="mr-2 text-orange-500">•</span> After-hours lead capture</li>
+                     <li className="flex items-start"><span className="mr-2 text-orange-500">•</span> Emergency safety triage</li>
+                     <li className="flex items-start"><span className="mr-2 text-orange-500">•</span> Quick callback logging</li>
                 </>
             )}
         </ul>
@@ -55,7 +54,7 @@ const AgentCard: React.FC<AgentCardProps> = ({ type, language, onTest }) => {
         }`}
       >
         <Phone size={18} />
-        <span>{language === 'pl' ? 'Przetestuj agenta' : 'Test this voice agent'}</span>
+        <span>Test this voice agent</span>
       </button>
     </div>
   );
