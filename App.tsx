@@ -229,7 +229,7 @@ const App: React.FC = () => {
           </header>
 
           {/* Agents Section */}
-          <section id="agents" className="py-20 bg-gray-50 dark:bg-gray-950 scroll-mt-24">
+          <section id="agents" className="py-20 bg-gray-50 dark:bg-gray-950 scroll-mt-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-16">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{t.agentsTitle}</h2>
@@ -244,7 +244,7 @@ const App: React.FC = () => {
           </section>
 
           {/* Live Dashboard Mockup (Moved before Benefits) */}
-          <section id="dashboard" className="py-12 bg-white dark:bg-gray-900 border-y border-gray-200 dark:border-gray-800 scroll-mt-24">
+          <section id="dashboard" className="py-12 bg-white dark:bg-gray-900 border-y border-gray-200 dark:border-gray-800 scroll-mt-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between mb-8">
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -297,7 +297,7 @@ const App: React.FC = () => {
           </section>
 
           {/* Benefits Section (Expanded) */}
-          <section id="benefits" className="py-20 bg-gray-50 dark:bg-gray-950 scroll-mt-24">
+          <section id="benefits" className="py-20 bg-gray-50 dark:bg-gray-900 scroll-mt-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{t.benefitsTitle}</h2>
@@ -324,7 +324,7 @@ const App: React.FC = () => {
           </section>
 
           {/* How it Works (Expanded) */}
-          <section id="how-it-works" className="py-20 bg-white dark:bg-gray-900 scroll-mt-24">
+          <section id="how-it-works" className="py-20 bg-white dark:bg-gray-900 scroll-mt-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{t.howItWorksTitle}</h2>
