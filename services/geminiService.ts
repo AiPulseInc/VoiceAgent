@@ -1,6 +1,6 @@
 import { GoogleGenAI, LiveServerMessage, Modality, FunctionDeclaration, Type } from '@google/genai';
 import { floatTo16BitPCM, base64ToArrayBuffer, RECORDER_WORKLET_CODE } from '../utils/audioUtils';
-import { scheduleWithWebhook, logCallback } from '../utils/mockBackend';
+import { scheduleWithWebhook, logCallback, logCallStart } from '../utils/mockBackend';
 
 export interface LogEntry {
   type: 'info' | 'tool_req' | 'tool_res' | 'error' | 'webhook';
@@ -109,6 +109,8 @@ export class GeminiLiveService {
           onopen: () => {
             options.onLog({ type: 'info', message: 'Session Connected' });
             this.isConnected = true;
+            // TRACKING: Log that a call started for the dashboard
+            logCallStart(); 
             this.startAudioInput();
           },
           onmessage: async (message: LiveServerMessage) => {

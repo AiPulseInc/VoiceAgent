@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { GeminiLiveService, LogEntry } from '../services/geminiService';
-import { AGENT_CONFIGS } from '../constants';
+import { getAgentConfigs } from '../constants';
 import { AgentType, ChatMessage } from '../types';
 import Visualizer from './Visualizer';
 import { X, Mic, MicOff, Phone, Settings, Terminal } from 'lucide-react';
 
 interface LiveDemoProps {
   agentType: AgentType;
+  language: 'en' | 'pl';
   onClose: () => void;
 }
 
@@ -32,7 +33,7 @@ const getTimeContext = () => {
   `;
 };
 
-const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
+const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, language, onClose }) => {
   const [isActive, setIsActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -44,7 +45,7 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
-  const config = agentType === AgentType.BOOKING ? AGENT_CONFIGS.BOOKING : AGENT_CONFIGS.OVERFLOW;
+  const config = agentType === AgentType.BOOKING ? getAgentConfigs(language).BOOKING : getAgentConfigs(language).OVERFLOW;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -126,37 +127,37 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
       <div className="flex w-full max-w-5xl h-[90vh] gap-4">
         
         {/* Main Chat Interface */}
-        <div className="flex-1 bg-gray-900 rounded-2xl border border-gray-700 shadow-2xl overflow-hidden flex flex-col">
+        <div className="flex-1 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden flex flex-col">
             
             {/* Header */}
-            <div className="bg-gray-800 p-4 flex items-center justify-between border-b border-gray-700">
+            <div className="bg-gray-100 dark:bg-gray-800 p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center space-x-3">
                     <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
                     <div>
-                        <h3 className="font-bold text-white">{config.name}</h3>
-                        <p className="text-xs text-gray-400">Powered by Gemini Live</p>
+                        <h3 className="font-bold text-gray-900 dark:text-white">{config.name}</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Powered by Gemini Live</p>
                     </div>
                 </div>
                 <div className="flex items-center space-x-4">
                     <button 
                         onClick={() => setShowDebug(!showDebug)}
-                        className={`text-xs flex items-center space-x-1 px-2 py-1 rounded border ${showDebug ? 'bg-blue-900/50 border-blue-500 text-blue-200' : 'border-gray-600 text-gray-400'}`}
+                        className={`text-xs flex items-center space-x-1 px-2 py-1 rounded border ${showDebug ? 'bg-blue-100 dark:bg-blue-900/50 border-blue-500 text-blue-700 dark:text-blue-200' : 'border-gray-400 dark:border-gray-600 text-gray-500 dark:text-gray-400'}`}
                     >
                         <Terminal size={12} />
                         <span>Debug Log</span>
                     </button>
-                    <button onClick={endSession} className="text-gray-400 hover:text-white">
+                    <button onClick={endSession} className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
                         <X size={24} />
                     </button>
                 </div>
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 relative bg-white dark:bg-gray-900">
                 {messages.length === 0 && !error && (
                     <div className="text-center text-gray-500 mt-20">
-                        <p>{isActive ? "Connected! Say 'Hello' to start." : "Connecting to secure line..."}</p>
-                        <p className="text-xs mt-2">Microphone is active.</p>
+                        <p>{isActive ? (language === 'pl' ? "Połączono! Powiedz 'Cześć' aby zacząć." : "Connected! Say 'Hello' to start.") : (language === 'pl' ? "Nawiązywanie połączenia..." : "Connecting to secure line...")}</p>
+                        <p className="text-xs mt-2">{language === 'pl' ? 'Mikrofon aktywny' : 'Microphone is active.'}</p>
                     </div>
                 )}
                 
@@ -166,8 +167,8 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
                             msg.role === 'user' 
                             ? 'bg-blue-600 text-white' 
                             : msg.role === 'system'
-                            ? 'bg-gray-800 text-xs text-gray-400 italic border border-gray-700'
-                            : 'bg-gray-700 text-gray-200'
+                            ? 'bg-gray-200 dark:bg-gray-800 text-xs text-gray-500 dark:text-gray-400 italic border border-gray-300 dark:border-gray-700'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                         }`}>
                             {msg.text}
                         </div>
@@ -177,7 +178,7 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
                 {/* Tool Activity Indicator */}
                 {currentTool && (
                     <div className="flex justify-center">
-                        <div className="bg-gray-800 text-orange-400 text-xs px-3 py-1 rounded-full flex items-center space-x-2 border border-orange-500/30 animate-pulse">
+                        <div className="bg-gray-100 dark:bg-gray-800 text-orange-500 dark:text-orange-400 text-xs px-3 py-1 rounded-full flex items-center space-x-2 border border-orange-500/30 animate-pulse">
                             <Settings size={12} className="animate-spin" />
                             <span>System accessing: {currentTool}...</span>
                         </div>
@@ -185,7 +186,7 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
                 )}
 
                 {error && (
-                    <div className="bg-red-900/50 border border-red-500 text-red-200 p-3 rounded-lg text-sm text-center">
+                    <div className="bg-red-100 dark:bg-red-900/50 border border-red-500 text-red-800 dark:text-red-200 p-3 rounded-lg text-sm text-center">
                         {error}
                     </div>
                 )}
@@ -193,18 +194,18 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
             </div>
 
             {/* Controls */}
-            <div className="bg-gray-800 p-6 flex flex-col items-center space-y-4 border-t border-gray-700">
+            <div className="bg-gray-100 dark:bg-gray-800 p-6 flex flex-col items-center space-y-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="w-full flex justify-between items-center px-4">
                     <div className="text-xs text-gray-500 flex items-center space-x-2">
                         <Visualizer isActive={isActive} />
-                        <span>{isActive ? 'Listening...' : 'Paused'}</span>
+                        <span>{isActive ? (language === 'pl' ? 'Słucham...' : 'Listening...') : (language === 'pl' ? 'Wstrzymano' : 'Paused')}</span>
                     </div>
-                    <span className="text-xs text-gray-600 uppercase tracking-widest">{config.voice}</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-widest">{config.voice}</span>
                 </div>
 
                 <div className="flex items-center space-x-6">
                     <button 
-                        className="w-14 h-14 rounded-full flex items-center justify-center bg-gray-700 text-white hover:bg-gray-600 transition"
+                        className="w-14 h-14 rounded-full flex items-center justify-center bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-600 transition"
                         onClick={() => {}}
                     >
                         {isActive ? <Mic size={24} /> : <MicOff size={24} />}
@@ -221,9 +222,9 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
 
         {/* Debug Side Panel */}
         {showDebug && (
-            <div className="w-80 bg-black rounded-2xl border border-gray-800 flex flex-col overflow-hidden shadow-2xl">
-                <div className="bg-gray-900 p-3 border-b border-gray-800 flex justify-between items-center">
-                    <div className="flex items-center gap-2 text-gray-300 font-mono text-xs font-bold uppercase tracking-wider">
+            <div className="w-80 bg-white dark:bg-black rounded-2xl border border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden shadow-2xl">
+                <div className="bg-gray-100 dark:bg-gray-900 p-3 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
+                    <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-mono text-xs font-bold uppercase tracking-wider">
                         <Terminal size={14} className="text-blue-500" />
                         Live Agent Logs
                     </div>
@@ -232,23 +233,23 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
                 
                 <div className="flex-1 overflow-y-auto p-3 space-y-3 font-mono text-xs">
                     {debugLogs.length === 0 && (
-                        <div className="text-gray-600 italic text-center mt-10">Waiting for events...</div>
+                        <div className="text-gray-500 dark:text-gray-600 italic text-center mt-10">Waiting for events...</div>
                     )}
                     
                     {debugLogs.map((log, i) => (
                         <div key={i} className={`p-2 rounded border ${
-                            log.type === 'tool_req' ? 'bg-blue-900/20 border-blue-800 text-blue-300' :
-                            log.type === 'tool_res' ? 'bg-green-900/20 border-green-800 text-green-300' :
-                            log.type === 'webhook' ? 'bg-purple-900/20 border-purple-800 text-purple-300' :
-                            log.type === 'error' ? 'bg-red-900/20 border-red-800 text-red-300' :
-                            'bg-gray-900 border-gray-800 text-gray-400'
+                            log.type === 'tool_req' ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300' :
+                            log.type === 'tool_res' ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300' :
+                            log.type === 'webhook' ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300' :
+                            log.type === 'error' ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300' :
+                            'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'
                         }`}>
                             <div className="flex justify-between items-start mb-1 opacity-50">
                                 <span>{log.type.toUpperCase()}</span>
                             </div>
                             <div className="mb-1 font-semibold break-words">{log.message}</div>
                             {log.data && (
-                                <pre className="bg-black/50 p-2 rounded overflow-x-auto text-[10px] text-gray-300">
+                                <pre className="bg-gray-100 dark:bg-black/50 p-2 rounded overflow-x-auto text-[10px] text-gray-700 dark:text-gray-300">
                                     {JSON.stringify(log.data, null, 2)}
                                 </pre>
                             )}
@@ -257,7 +258,7 @@ const LiveDemo: React.FC<LiveDemoProps> = ({ agentType, onClose }) => {
                     <div ref={logsEndRef} />
                 </div>
                 
-                <div className="p-2 bg-gray-900 border-t border-gray-800 text-[10px] text-gray-500 text-center">
+                <div className="p-2 bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 text-[10px] text-gray-500 text-center">
                     n8n Webhook: .../webhook-test/test
                 </div>
             </div>
