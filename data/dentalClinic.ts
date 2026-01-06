@@ -108,7 +108,7 @@ export const dentalConfig: DemoConfig = {
       navHow: "Process",
       navDiagnostics: "System Check",
       selectKey: "Enter API Key",
-      ver: "v1.2 Medical",
+      ver: "v0.53 Powered by Google Gemini Live",
       agents: {
         [AgentType.BOOKING]: {
           name: "Receptionist Sarah",
@@ -186,7 +186,7 @@ export const dentalConfig: DemoConfig = {
       navHow: "Proces",
       navDiagnostics: "System",
       selectKey: "Podaj Klucz API",
-      ver: "v1.2 Medical",
+      ver: "v0.53 Powered by Google Gemini Live",
       agents: {
         [AgentType.BOOKING]: {
           name: "Recepcjonistka Sarah",

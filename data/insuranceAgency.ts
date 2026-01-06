@@ -101,7 +101,7 @@ export const insuranceConfig: DemoConfig = {
       navHow: "Claims",
       navDiagnostics: "Tech Check",
       selectKey: "API Key",
-      ver: "v2.0 Enterprise",
+      ver: "v0.53 Powered by Google Gemini Live",
       agents: {
         [AgentType.BOOKING]: {
           name: "Broker Alex",
@@ -179,7 +179,7 @@ export const insuranceConfig: DemoConfig = {
       navHow: "Szkody",
       navDiagnostics: "Stan Techniczny",
       selectKey: "Klucz API",
-      ver: "v2.0 Enterprise",
+      ver: "v0.53 Powered by Google Gemini Live",
       agents: {
         [AgentType.BOOKING]: {
           name: "Broker Alex",

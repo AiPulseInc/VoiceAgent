@@ -141,7 +141,7 @@ export const autoServiceConfig: DemoConfig = {
       navHow: "How it works",
       navDiagnostics: "Diagnostics",
       selectKey: "Select API Key",
-      ver: "Version 0.52",
+      ver: "v0.53 Powered by Google Gemini Live",
 
       agents: {
         [AgentType.BOOKING]: {
@@ -225,7 +225,7 @@ export const autoServiceConfig: DemoConfig = {
       navHow: "Jak to działa",
       navDiagnostics: "Diagnostyka",
       selectKey: "Wybierz Klucz API",
-      ver: "Version 0.52",
+      ver: "v0.53 Powered by Google Gemini Live",
 
       agents: {
         [AgentType.BOOKING]: {

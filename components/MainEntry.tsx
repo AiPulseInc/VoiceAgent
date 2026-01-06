@@ -18,6 +18,13 @@ const ConfigCard: React.FC<{ config: DemoConfig; onClick: () => void }> = ({ con
         return <Wrench className="text-white" size={32} />;
     };
 
+    // Helper for industry label
+    const getIndustryLabel = () => {
+        if (config.id === 'rapidtire') return 'Automotive Service';
+        if (config.id === 'brightsmile') return 'Dental Clinic';
+        return 'Insurance Agency';
+    };
+
     return (
         <div 
             onClick={onClick}
@@ -36,7 +43,12 @@ const ConfigCard: React.FC<{ config: DemoConfig; onClick: () => void }> = ({ con
                 <div className={`w-16 h-16 rounded-2xl ${config.theme.primaryBg} flex items-center justify-center mb-6 shadow-lg transform group-hover:rotate-6 transition-transform`}>
                     <Icon />
                 </div>
-                <h2 className="text-3xl font-bold text-white mb-2">{config.name}</h2>
+                
+                <h2 className="text-3xl font-bold text-white mb-1">{config.name}</h2>
+                <p className="text-blue-100/90 font-medium text-sm uppercase tracking-wider mb-4">
+                    {getIndustryLabel()}
+                </p>
+
                 <p className="text-gray-300 text-sm mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                     {config.id === 'rapidtire' ? 'Automotive Workshop Booking & Triage' : 
                      config.id === 'brightsmile' ? 'Dental Clinic Reception & Emergency' :

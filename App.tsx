@@ -444,7 +444,7 @@ const App: React.FC<AppProps> = ({ config, onBack }) => {
           </div>
           
           <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-xs">
-            <p>&copy; 2026 {config.name} Demo. Powered by Google Gemini Live.</p>
+            <p>&copy; 2026 {config.name} Demo by AiPulse</p>
             <div className="flex items-center space-x-4 mt-4 md:mt-0">
                <span>{t.ver}</span>
             </div>
