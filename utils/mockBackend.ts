@@ -47,8 +47,9 @@ export const scheduleWithWebhook = async (data: WebhookPayload, targetUrl: strin
         const rawText = await response.text();
         
         if (!response.ok) {
-             console.error("❌ [Webhook] Server error");
-             throw new Error(`Server returned ${response.status}: ${rawText.slice(0, 100)}`);
+             console.error(`❌ [Webhook] Server error: ${response.status}`);
+             console.error(`📄 [Webhook] Body: ${rawText}`);
+             throw new Error(`Server returned ${response.status}: ${rawText.slice(0, 200)}`);
         }
 
         if (!rawText.trim()) {
@@ -59,6 +60,7 @@ export const scheduleWithWebhook = async (data: WebhookPayload, targetUrl: strin
         try {
             json = JSON.parse(rawText);
         } catch (e) {
+            console.error("❌ [Webhook] JSON Parse Error. Raw text:", rawText);
             throw new Error(`Failed to parse JSON response: ${rawText.slice(0, 50)}...`);
         }
 

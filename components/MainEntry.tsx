@@ -56,9 +56,13 @@ const MainEntry: React.FC<MainEntryProps> = ({ onSelect }) => {
     <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-8 font-sans">
       <div className="max-w-7xl w-full">
         <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
-                AI Agent <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400">Platform</span>
-            </h1>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 mb-6">
+                <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight">
+                    AI Agent <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400">Platform</span>
+                </h1>
+                <span className="text-base font-normal text-white opacity-70 mt-2 md:mt-4">v0.53</span>
+            </div>
+            
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
                 Select an industry vertical to experience a specialized Gemini Live voice agent implementation.
             </p>
@@ -71,7 +75,7 @@ const MainEntry: React.FC<MainEntryProps> = ({ onSelect }) => {
         </div>
 
         <div className="mt-20 text-center">
-            <p className="text-gray-600 text-sm">Powered by Google Gemini Multimodal Live API • v2.0</p>
+            <p className="text-gray-600 text-sm">@2026 Voice Agents Demo by AiPulse</p>
         </div>
       </div>
     </div>

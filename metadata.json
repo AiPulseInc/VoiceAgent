@@ -1,5 +1,5 @@
 {
-  "name": "RapidTire Auto Service Demo",
+  "name": "VoiceAgents Demo Platform",
   "description": "A demo of voice AI agents for a busy tire workshop handling bookings and overflow calls.",
   "requestFramePermissions": [
     "microphone"

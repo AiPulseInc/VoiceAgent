@@ -149,18 +149,22 @@ export class GeminiLiveService {
                 
                 try {
                   const args = fc.args as any;
+                  
                   if (fc.name === 'scheduleAppointment') {
-                    // Use Dynamic Webhook URL from Options
-                    options.onLog({ type: 'webhook', message: 'Sending POST request...', data: { url: options.webhookUrl, payload: args } });
+                    // ARGUMENT SANITIZATION
+                    // Fixes issue where AI sends undefined/null for missing fields, causing Webhook failure.
+                    const safePayload = {
+                        name: args.name ? String(args.name) : "Valued Customer",
+                        phone: args.phone ? String(args.phone) : "Not Provided",
+                        email: args.email ? String(args.email) : "no-email@example.com",
+                        date: args.date ? String(args.date) : new Date().toISOString().split('T')[0],
+                        time: args.time ? String(args.time) : "Unspecified",
+                        request: args.request ? String(args.request) : "General Inquiry"
+                    };
+
+                    options.onLog({ type: 'webhook', message: 'Sending POST request...', data: { url: options.webhookUrl, payload: safePayload } });
                     
-                    result = await scheduleWithWebhook({
-                        name: args.name,
-                        phone: args.phone,
-                        email: args.email,
-                        date: args.date,
-                        time: args.time,
-                        request: args.request
-                    }, options.webhookUrl);
+                    result = await scheduleWithWebhook(safePayload, options.webhookUrl);
 
                     options.onLog({ type: 'webhook', message: 'Webhook Response', data: result });
 
